@@ -1,6 +1,6 @@
-# ansible-role-monitoring [![Ansible Lint](https://github.com/DODAS-TS/ansible-role-monitoring/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/DODAS-TS/ansible-role-monitoring/actions/workflows/ansible-lint.yml)
+# ansible-role-monitoring
 
-A role to setup a custom monitoring on a node
+Ansible role to setup a custom monitoring on a node
 
 Requirements
 ------------
@@ -60,13 +60,3 @@ Including an example of how to use your role (for instance, with variables passe
            service_grafana_admin_password: example_password
 
 ```
-
-License
--------
-
-Apache 2.0
-
-Author Information
-------------------
-
-DODAS-TS
