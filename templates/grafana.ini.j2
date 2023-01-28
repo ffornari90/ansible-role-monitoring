@@ -6,15 +6,14 @@ team_ids =
 allowed_organizations =
 name = IAM
 client_id = "{{ client_id }}"
-
 client_secret = "{{ client_secret }}"
-
+redirect_url = "https://{{ monitoring_server_ip }}.myip.cloud.infn.it:{{ service_grafana_port }}/login/generic_oauth"
 scopes = openid profile email
 auth_url = {{ monitoring_iam_url }}/authorize
 token_url = {{ monitoring_iam_url }}/token
 api_url = {{ monitoring_iam_url }}/userinfo
-
 role_attribute_path = sub=='{{ monitoring_iam_sub }}' && 'Admin' || contains(groups[*], '{{ monitoring_iam_admin_groups }}') && 'Editor' || 'Viewer'
+
 [security]
 cookie_secure=true
 
