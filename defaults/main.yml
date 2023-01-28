@@ -1,0 +1,17 @@
+---
+# defaults file for dodas-ts-monitoring
+monitoring_project_name: my-project
+
+monitoring_use_gpu: false
+
+monitoring_iam_url: "" # https://iam.example.url.it
+monitoring_iam_sub: ""
+monitoring_iam_groups: "beta_testers" # group1 group2
+monitoring_iam_admin_groups: "" # group1 group2
+monitoring_server_ip: "" # 192.168.1.42
+
+service_grafana: yes
+service_grafana_port: 3000
+service_grafana_admin_user: ""
+service_grafana_admin_password: ""
+service_grafana_image: "dodasts/monitoring-grafana:v1.0.3-monitoring"

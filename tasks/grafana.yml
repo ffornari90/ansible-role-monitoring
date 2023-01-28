@@ -1,0 +1,88 @@
+---
+- name: Create directory for monitoring
+  file:
+    path: /usr/local/share/dodasts/monitoring
+    state: directory
+    mode: 0755
+
+- name: Create directory for grafana
+  file:
+    path: /usr/local/share/dodasts/monitoring/grafana
+    state: directory
+    mode: 0755
+
+- name: Create grafana configs
+  copy:
+    src: "{{ role_path }}/files/grafana"
+    dest: /usr/local/share/dodasts/monitoring
+    directory_mode: 0755
+
+- block:
+  - name: Register iam client
+    uri:
+      url: "{{ monitoring_iam_url }}/register"
+      validate_certs: "no"
+      method: POST
+      status_code: 201
+      headers:
+         Content-Type: "application/json"
+      body:
+        redirect_uris:
+          - "https://{{ monitoring_server_ip }}:{{ service_grafana_port }}/login/generic_oauth"
+        client_name: "oc-client"
+        token_endpoint_auth_method: client_secret_basic
+        scope: openid email profile
+        grant_types:
+          - authorization_code
+        response_types:
+          - code
+      body_format: json
+      return_content: yes
+    register: iam_response
+
+  - name: Save client info
+    copy:
+      content: "{{ iam_response.json }}"
+      dest: "/usr/local/share/dodasts/monitoring/.client-iam.json"
+
+  - name: Create grafana config
+    template:
+      src: grafana.ini.j2
+      dest: /usr/local/share/dodasts/monitoring/grafana/config/custom.ini
+    vars:
+      client_id: "{{ iam_response.json.client_id }}"
+      client_secret: "{{ iam_response.json.client_secret }}"
+
+- name: let grafana to create admin
+  set_fact:
+    key_values: "yes"
+    service_grafana_disable_admin_creation: false
+  when: (service_grafana_admin_user|length > 0) and (service_grafana_admin_password|length > 0)
+
+- name: prepare variables for monitoring
+  set_fact:
+    key_value: "yes"
+    grafana_service: |
+      grafana:
+          image: {{ service_grafana_image }}
+          container_name: monitoring_grafana
+          depends_on:
+            - prometheus
+          restart: unless-stopped
+          command:
+            - "-config"
+            - "/opt/grafana/custom.ini"
+          ports:
+            - {{ service_grafana_port }}:{{ service_grafana_port }}
+          volumes:
+            - /usr/local/share/dodasts/certs/grafana:/usr/local/share/dodasts/certs/grafana
+            - /usr/local/share/dodasts/monitoring/grafana/data:/var/lib/grafana
+            - /usr/local/share/dodasts/monitoring/grafana/config:/opt/grafana/
+            - /usr/local/share/dodasts/monitoring/grafana/config/provisioning:/etc/grafana/provisioning
+            - /usr/local/share/dodasts/monitoring/grafana/dash_models:/opt/dash_models
+          environment:
+            - GF_SECURITY_ADMIN_USER={{ service_grafana_admin_user }}
+            - GF_SECURITY_ADMIN_PASSWORD={{ service_grafana_admin_password }}
+            - GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION={{ service_grafana_disable_admin_creation }}
+            - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_UNIFIED_ALERTING_ENABLED=true
