@@ -9,6 +9,7 @@ monitoring_iam_sub: ""
 monitoring_iam_groups: "beta_testers" # group1 group2
 monitoring_iam_admin_groups: "" # group1 group2
 monitoring_server_ip: "" # 192.168.1.42
+monitoring_dns_name: ""
 
 service_grafana: yes
 service_grafana_port: 3000

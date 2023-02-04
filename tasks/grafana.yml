@@ -28,7 +28,7 @@
          Content-Type: "application/json"
       body:
         redirect_uris:
-          - "https://{{ monitoring_server_ip }}.myip.cloud.infn.it:{{ service_grafana_port }}/login/generic_oauth"
+          - "https://{{ monitoring_dns_name }}:{{ service_grafana_port }}/login/generic_oauth"
         client_name: "oc-client"
         token_endpoint_auth_method: client_secret_basic
         scope: openid email profile
